@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 const cursor = {
   x: 0,
@@ -9,6 +10,8 @@ window.addEventListener('mousemove', (e) => {
   cursor.x = e.clientX / sizes.width - 0.5;
   cursor.y = e.clientY / sizes.height - 0.5;
 });
+
+// controls
 
 /**
  * Base
@@ -39,6 +42,10 @@ camera.position.z = 3;
 camera.lookAt(mesh.position);
 scene.add(camera);
 
+// controls
+
+const controls = new OrbitControls(camera, canvas);
+
 // Renderer
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
@@ -52,9 +59,10 @@ const clock = new THREE.Clock();
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
-  camera.position.x = Math.sin(Math.PI) * cursor.x * 10;
-  camera.position.y = cursor.y * 10;
-  camera.lookAt(mesh.position);
+  // camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 3;
+  // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 3;
+  // camera.position.y = cursor.y * 5;
+  // camera.lookAt(mesh.position);
 
   renderer.render(scene, camera);
 
