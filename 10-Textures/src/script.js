@@ -10,24 +10,32 @@ const canvas = document.querySelector('canvas.webgl');
 // Scene
 const scene = new THREE.Scene();
 
-// Textures vanilla way
-const image = new Image();
-const texture = new THREE.Texture(image);
-image.src = '/textures/door/color.jpg';
-
-image.onload = () => {
-  texture.needsUpdate = true;
-};
-
 // Textures three.js way
-// const textureLoader = new THREE.TextureLoader();
-// const texture = textureLoader.load('/textures/door/color.jpg');
+
+const textureLoader = new THREE.TextureLoader();
+const colorTexture = textureLoader.load('/textures/door/color.jpg');
+const alphaTexture = textureLoader.load('/textures/door/alpha.jpg');
+const heightTexture = textureLoader.load('/textures/door/height.jpg');
+const normalTexture = textureLoader.load('/textures/door/normal.jpg');
+const ambientOcclusionTexture = textureLoader.load(
+  '/textures/door/ambientOcclusion.jpg'
+);
+const metalnessTexture = textureLoader.load('/textures/door/metalness.jpg');
+const roughnessTexture = textureLoader.load('/textures/door/roughness.jpg');
+
+// colorTexture.rotation = 1;
+// colorTexture.center.x = 0.5;
+// colorTexture.center.y = 0.5;
+
+// colorTexture.magFilter = THREE.NearestFilter;
 
 /**
  * Object
  */
 const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ map: texture });
+const material = new THREE.MeshBasicMaterial({
+  map: colorTexture,
+});
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
@@ -63,9 +71,9 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.x = 1;
-camera.position.y = 1;
-camera.position.z = 1;
+camera.position.x = 2;
+camera.position.y = 2;
+camera.position.z = 2;
 scene.add(camera);
 
 // Controls
