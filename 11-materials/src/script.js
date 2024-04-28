@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import GUI from 'lil-gui';
+
+const gui = new GUI();
 
 // Textures
 const textureLoader = new THREE.TextureLoader();
@@ -41,6 +44,13 @@ const material = new THREE.MeshStandardMaterial();
 // material.gradientMap = gradientTexture;
 // material.shininess = 100;
 // material.specular = new THREE.Color(0x1188ff);
+material.map = doorColorTexture;
+material.color = new THREE.Color('#ab6f48');
+material.metalness = 0.45;
+material.roughness = 0.68;
+
+gui.add(material, 'metalness').min(0).max(1).step(0.0001);
+gui.add(material, 'roughness').min(0).max(1).step(0.0001);
 
 const sphereMesh = new THREE.Mesh(
   new THREE.SphereGeometry(0.5, 16, 16),
@@ -62,11 +72,29 @@ torusMesh.position.x = 1.5;
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
-const pointLight = new THREE.PointLight(0xffffff, 80);
+const pointLight = new THREE.PointLight(0xffffff, 140);
 pointLight.position.x = 2;
 pointLight.position.y = 3;
 pointLight.position.z = 4;
 scene.add(pointLight);
+
+material.aoMap = doorAmbientOcclussionTexture;
+material.aoMapIntensity = 10;
+
+planeMesh.geometry.setAttribute(
+  'uv2',
+  new THREE.BufferAttribute(planeMesh.geometry.attributes.uv.array, 2)
+);
+
+sphereMesh.geometry.setAttribute(
+  'uv2',
+  new THREE.BufferAttribute(sphereMesh.geometry.attributes.uv.array, 2)
+);
+
+torusMesh.geometry.setAttribute(
+  'uv2',
+  new THREE.BufferAttribute(torusMesh.geometry.attributes.uv.array, 2)
+);
 
 /**
  * Sizesx
