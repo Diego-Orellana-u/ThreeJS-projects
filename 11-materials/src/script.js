@@ -44,21 +44,26 @@ const material = new THREE.MeshStandardMaterial();
 // material.gradientMap = gradientTexture;
 // material.shininess = 100;
 // material.specular = new THREE.Color(0x1188ff);
+// material.wireframe = true;
 material.map = doorColorTexture;
 material.color = new THREE.Color('#ab6f48');
-material.metalness = 0.45;
-material.roughness = 0.68;
-
-gui.add(material, 'metalness').min(0).max(1).step(0.0001);
-gui.add(material, 'roughness').min(0).max(1).step(0.0001);
+// material.metalness = 0.45;
+// material.roughness = 0.68;
+material.displacementScale = 0.05;
+material.metalnessMap = doorMetalnessTexture;
+material.roughnessMap = doorRoughnessTexture;
+material.normalMap = doorNormalTexture;
 
 const sphereMesh = new THREE.Mesh(
-  new THREE.SphereGeometry(0.5, 16, 16),
+  new THREE.SphereGeometry(0.5, 64, 64),
   material
 );
-const planeMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
+const planeMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(1, 1, 100, 100),
+  material
+);
 const torusMesh = new THREE.Mesh(
-  new THREE.TorusGeometry(0.3, 0.2, 16, 32),
+  new THREE.TorusGeometry(0.3, 0.2, 64, 128),
   material
 );
 
@@ -79,7 +84,9 @@ pointLight.position.z = 4;
 scene.add(pointLight);
 
 material.aoMap = doorAmbientOcclussionTexture;
-material.aoMapIntensity = 10;
+material.aoMapIntensity = 4;
+
+material.displacementMap = doorHeightTexture;
 
 planeMesh.geometry.setAttribute(
   'uv2',
@@ -95,6 +102,11 @@ torusMesh.geometry.setAttribute(
   'uv2',
   new THREE.BufferAttribute(torusMesh.geometry.attributes.uv.array, 2)
 );
+
+gui.add(material, 'metalness').min(0).max(1).step(0.0001);
+gui.add(material, 'roughness').min(0).max(1).step(0.0001);
+gui.add(material, 'aoMapIntensity').min(0).max(10).step(0.01);
+gui.add(material, 'displacementScale').min(0).max(0.5).step(0.01);
 
 /**
  * Sizesx
