@@ -28,7 +28,7 @@ const matcapTexture = textureLoader.load('textures/matcaps/9.png');
 // Fonts
 const fontLoader = new FontLoader();
 fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-  const textGeometry = new TextGeometry('Hello Three.js', {
+  const textGeometry = new TextGeometry('Mandale saludos al choco', {
     font: font,
     size: 0.5,
     height: 0.2,
@@ -50,18 +50,18 @@ fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
   // );
   textGeometry.center();
 
-  const textMaterial = new THREE.MeshMatcapMaterial();
+  const material = new THREE.MeshNormalMaterial();
   //   textMaterial.wireframe = true;
-  textMaterial.matcap = matcapTexture;
-  const mesh_1 = new THREE.Mesh(textGeometry, textMaterial);
+
+  const mesh_1 = new THREE.Mesh(textGeometry, material);
 
   scene.add(mesh_1);
+
+  console.time('torus');
+  const torusGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45);
+
   for (let i = 0; i < 100; i++) {
-    const torusGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45);
-    const torusMaterial = new THREE.MeshMatcapMaterial({
-      matcap: matcapTexture,
-    });
-    const torus = new THREE.Mesh(torusGeometry, torusMaterial);
+    const torus = new THREE.Mesh(torusGeometry, material);
 
     torus.position.x = (Math.random() - 0.5) * 10;
     torus.position.y = (Math.random() - 0.5) * 10;
@@ -76,6 +76,7 @@ fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
 
     scene.add(torus);
   }
+  console.timeEnd('torus');
 });
 
 /**
