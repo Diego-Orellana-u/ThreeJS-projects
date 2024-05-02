@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import GUI from 'lil-gui';
 import typeFaceFont from '../static/fonts/helvetiker_regular.typeface.json';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 /**
@@ -22,6 +23,8 @@ const scene = new THREE.Scene();
  */
 const textureLoader = new THREE.TextureLoader();
 
+const matcapTexture = textureLoader.load('textures/matcaps/9.png');
+
 // Fonts
 const fontLoader = new FontLoader();
 fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
@@ -29,17 +32,50 @@ fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
     font: font,
     size: 0.5,
     height: 0.2,
-    curveSegments: 5,
+    curveSegments: 12,
+    bevelEnabled: true,
     bevelThickness: 0.03,
     bevelSize: 0.02,
     bevelOffset: 0,
-    bevelSegments: 5,
+    bevelSegments: 4,
   });
 
-  const textMaterial = new THREE.MeshBasicMaterial();
-  textMaterial.wireframe = true;
-  const text = new THREE.Mesh(textGeometry, textMaterial);
-  scene.add(text);
+  // textGeometry.computeBoundingBox();
+  // console.log(textGeometry.boundingBox);
+
+  // textGeometry.translate(
+  //   -(textGeometry.boundingBox.max.x - 0.02) * 0.5,
+  //   -(textGeometry.boundingBox.max.y - 0.16) * 0.5,
+  //   -(textGeometry.boundingBox.max.z - 0.03) * 0.5
+  // );
+  textGeometry.center();
+
+  const textMaterial = new THREE.MeshMatcapMaterial();
+  //   textMaterial.wireframe = true;
+  textMaterial.matcap = matcapTexture;
+  const mesh_1 = new THREE.Mesh(textGeometry, textMaterial);
+
+  scene.add(mesh_1);
+  for (let i = 0; i < 100; i++) {
+    const torusGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45);
+    const torusMaterial = new THREE.MeshMatcapMaterial({
+      matcap: matcapTexture,
+    });
+    const torus = new THREE.Mesh(torusGeometry, torusMaterial);
+
+    torus.position.x = (Math.random() - 0.5) * 10;
+    torus.position.y = (Math.random() - 0.5) * 10;
+    torus.position.z = (Math.random() - 0.5) * 10;
+
+    torus.rotation.x = Math.random() * Math.PI;
+    torus.rotation.y = Math.random() * Math.PI;
+
+    const scale = Math.random();
+
+    torus.scale.set(scale, scale, scale);
+
+    scene.add(torus);
+  }
 });
 
 /**
