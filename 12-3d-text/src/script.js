@@ -28,7 +28,7 @@ const matcapTexture = textureLoader.load('textures/matcaps/9.png');
 // Fonts
 const fontLoader = new FontLoader();
 fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-  const textGeometry = new TextGeometry('Arantza pasa el poto', {
+  const textGeometry = new TextGeometry('Hola papi', {
     font: font,
     size: 0.5,
     height: 0.2,
@@ -49,7 +49,7 @@ fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
   scene.add(mesh_1);
 
   console.time('torus');
-  const torusGeometry = new THREE.SphereGeometry(0.7, 0.2, 0, 45);
+  const torusGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45);
 
   for (let i = 0; i < 100; i++) {
     const torus = new THREE.Mesh(torusGeometry, material);
