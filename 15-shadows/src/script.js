@@ -56,6 +56,20 @@ scene.add(sphere, plane);
 
 directionalLight.castShadow = true;
 
+directionalLight.shadow.mapSize.width = 1024;
+directionalLight.shadow.mapSize.height = 1024;
+
+directionalLight.shadow.camera.near = 1;
+directionalLight.shadow.camera.far = 6;
+directionalLight.shadow.camera.top = 2;
+directionalLight.shadow.camera.right = 2;
+directionalLight.shadow.camera.bottom = -2;
+directionalLight.shadow.camera.left = -2;
+
+const directionalHelper = new THREE.CameraHelper(
+  directionalLight.shadow.camera
+);
+scene.add(directionalHelper); // has to be added after the modifications to the directionalLight
 /**
  * Sizes
  */
