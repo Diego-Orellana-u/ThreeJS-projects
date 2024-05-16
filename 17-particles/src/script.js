@@ -32,9 +32,22 @@ const textureLoader = new THREE.TextureLoader();
 // scene.add(particles);
 
 // Random points
-const particlesGeometry = new THREE.BufferGeometry(1, 1, 1);
+const particlesGeometry = new THREE.BufferGeometry();
+
+const vertices = [];
+
+for (let i = 0; i < 3000; i++) {
+  vertices[i] = (0.5 - Math.random()) * 10;
+}
+const finalVertices = new Float32Array(vertices);
+
+particlesGeometry.setAttribute(
+  'position',
+  new THREE.BufferAttribute(finalVertices, 3)
+);
+
 const particlesMaterial = new THREE.PointsMaterial();
-particlesMaterial.size = 4;
+particlesMaterial.size = 0.04;
 particlesMaterial.sizeAttenuation = true;
 
 const particles = new THREE.Points(particlesGeometry, particlesMaterial);
