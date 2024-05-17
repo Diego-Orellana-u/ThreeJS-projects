@@ -18,37 +18,37 @@ const scene = new THREE.Scene();
  * Textures
  */
 const textureLoader = new THREE.TextureLoader();
+const particlesTexture = textureLoader.load('/textures/particles/2.png');
 
-// // Particles geometry
-// const particlesGeometry = new THREE.SphereGeometry(1, 32, 32);
-
-// // Particles Material
-// const particlesMaterial = new THREE.PointsMaterial();
-// particlesMaterial.size = 0.04;
-// particlesMaterial.sizeAttenuation = false;
-
-// // Points
-// const particles = new THREE.Points(particlesGeometry, particlesMaterial);
-// scene.add(particles);
-
-// Random points
 const particlesGeometry = new THREE.BufferGeometry();
+const count = 20000;
 
-const vertices = [];
+const vertices = new Float32Array(count * 3);
+const colors = new Float32Array(count * 3);
 
-for (let i = 0; i < 3000; i++) {
+for (let i = 0; i < count * 3; i++) {
   vertices[i] = (0.5 - Math.random()) * 10;
+  colors[i] = Math.random();
 }
-const finalVertices = new Float32Array(vertices);
 
 particlesGeometry.setAttribute(
   'position',
-  new THREE.BufferAttribute(finalVertices, 3)
+  new THREE.BufferAttribute(vertices, 3)
 );
 
+particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
 const particlesMaterial = new THREE.PointsMaterial();
+console.log(particlesMaterial);
 particlesMaterial.size = 0.04;
 particlesMaterial.sizeAttenuation = true;
+// particlesMaterial.color = new THREE.Color('#ff88cc');
+particlesMaterial.transparent = true;
+particlesMaterial.alphaMap = particlesTexture;
+particlesMaterial.alphaTest = 0.01;
+particlesMaterial.depthWrite = false;
+particlesMaterial.blending = THREE.AdditiveBlending;
+particlesMaterial.vertexColors = true;
 
 const particles = new THREE.Points(particlesGeometry, particlesMaterial);
 scene.add(particles);
@@ -108,6 +108,19 @@ const clock = new THREE.Clock();
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
+
+  // particles.position.y = elapsedTime * 0.2;
+
+  for (let i = 0; i < count; i++) {
+    let i3 = i * 3;
+
+    const x = particlesGeometry.attributes.position.array[i3 + 0];
+    particlesGeometry.attributes.position.array[i3 + 1] = Math.sin(
+      elapsedTime + x
+    );
+  }
+
+  particlesGeometry.attributes.position.needsUpdate = true;
 
   // Update controls
   controls.update();
