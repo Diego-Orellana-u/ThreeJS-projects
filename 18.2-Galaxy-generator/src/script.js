@@ -16,7 +16,7 @@ const scene = new THREE.Scene();
 
 // Parameters
 const parameters = {};
-parameters.count = 100000;
+parameters.count = 10000;
 parameters.size = 0.01;
 parameters.branches = 3;
 parameters.radius = 5;
