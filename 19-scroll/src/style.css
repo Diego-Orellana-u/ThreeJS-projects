@@ -4,12 +4,6 @@
     padding: 0;
 }
 
-html,
-body
-{
-    overflow: hidden;
-}
-
 .webgl
 {
     position: fixed;
@@ -36,4 +30,7 @@ body
 section:nth-child(odd)
 {
     justify-content: flex-end;
+}
+html{
+    background-color: #1e1a20;
 }
