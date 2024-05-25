@@ -7,7 +7,7 @@ import GUI from 'lil-gui'
 const gui = new GUI()
 
 const parameters = {
-    materialColor: '#ffeded'
+    materialColor: '#ffedef'
 }
 
 gui
@@ -15,6 +15,7 @@ gui
     .onChange(() => {
         material.color.set(parameters.materialColor)
     })
+    
 
 /**
  * Base
@@ -54,6 +55,28 @@ knotTorus.position.x = 2
 scene.add(torus, cone,knotTorus)
 
 const sectionMeshes = [torus, cone, knotTorus]
+
+// Particles
+const particlesCount = 200
+const positions = new Float32Array(particlesCount * 3)
+
+for(let i = 0; i < particlesCount; i++){
+    positions[i * 3 + 0] = Math.random()
+    positions[i * 3 + 1] = Math.random()
+    positions[i * 3 + 2] = Math.random()
+}
+
+const particlesGeometry = new THREE.BufferGeometry()
+particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+
+const particlesMaterial = new THREE.PointsMaterial({
+    color: parameters.materialColor,
+    sizeAttenuation: true,
+    size: 0.03
+})
+
+const particles = new THREE.Points(particlesGeometry, particlesMaterial)
+scene.add(particles)
 
 // Light
 const directionalLight = new THREE.DirectionalLight('#ffffff', 3)
@@ -138,8 +161,9 @@ const tick = () =>
     camera.position.y = - scrollY / sizes.height * objectsDistance
 
     const parallaxX = cursor.x
-    const parallaxY = cursor.y
+    const parallaxY = - cursor.y
     
+    // ??
     cameraGroup.position.x += (parallaxX - cameraGroup.position.x) * 0.08
     cameraGroup.position.y += (parallaxY - cameraGroup.position.y) * 0.08
 
