@@ -20,6 +20,16 @@ debugObject.createSphere = () => {
 
 gui.add(debugObject, "createSphere");
 
+debugObject.createBox = () => {
+  createBox(Math.random(), Math.random(), Math.random(), {
+    x: (Math.random() - 0.5) * 3,
+    y: 3,
+    z: (Math.random() - 0.5) * 3,
+  });
+};
+
+gui.add(debugObject, "createBox");
+
 /**
  * Base
  */
@@ -163,6 +173,45 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 const objectsToUpdate = [];
 
+const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
+
+const createBox = (width, height, depth, position) => {
+  const boxMaterial = new THREE.MeshStandardMaterial({
+    metalness: 0.3,
+    roughness: 0.4,
+    envMap: environmentMapTexture,
+    color: "#922233",
+  });
+  const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+  const color1 = Math.floor(Math.random() * 255);
+  const color2 = Math.floor(Math.random() * 255);
+  const color3 = Math.floor(Math.random() * 255);
+
+  boxMesh.material.color.set(`rgb(${color1},${color2},${color3})`);
+
+  boxMesh.position.copy(position);
+  boxMesh.castShadow = true;
+  boxMesh.scale.set(width, height, depth);
+
+  scene.add(boxMesh);
+
+  const boxShape = new CANNON.Box(
+    new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5)
+  );
+
+  const boxBody = new CANNON.Body({
+    mass: 1,
+    position: position,
+    shape: boxShape,
+    material: defaultMaterial,
+  });
+
+  world.addBody(boxBody);
+  objectsToUpdate.push({ mesh: boxMesh, body: boxBody });
+};
+
+createBox(1, 1, 1, { x: 0, y: 4, z: 0 });
+
 const sphereGeometry = new THREE.SphereGeometry(1, 20, 20);
 const sphereMaterial = new THREE.MeshStandardMaterial({
   metalness: 0.3,
@@ -184,7 +233,7 @@ const createSphere = (radius, position) => {
   const shape = new CANNON.Sphere(radius);
   const body = new CANNON.Body({
     mass: 1,
-    position: new CANNON.Vec3(0, 3, 0),
+    position: position,
     shape,
     material: defaultMaterial,
   });
@@ -199,7 +248,7 @@ createSphere(0.5, { x: 0, y: 3, z: 0 });
 debugObject.applyWind = () => {
   objectsToUpdate.forEach((obj) => {
     let body = obj.body;
-    body.applyForce(new CANNON.Vec3(1500, 0, 0), body.position);
+    body.applyForce(new CANNON.Vec3(0, 1500, 0), body.position);
   });
 };
 
@@ -222,6 +271,7 @@ const tick = () => {
 
   for (let object of objectsToUpdate) {
     object.mesh.position.copy(object.body.position);
+    object.mesh.quaternion.copy(object.body.quaternion);
   }
 
   // Update controls
