@@ -156,7 +156,7 @@ const tick = () =>
     oldElapsedTime = elapsedTime
 
     // Update physics world
-    console.log("1")
+    console.log("conflict incoming")
 
     // Update controls
     controls.update()
