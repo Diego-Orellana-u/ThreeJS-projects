@@ -156,7 +156,11 @@ const tick = () =>
     oldElapsedTime = elapsedTime
 
     // Update physics world
+<<<<<<< HEAD
     console.log("conflict incoming")
+=======
+    console.log("hola")
+>>>>>>> branch-test-2
 
     // Update controls
     controls.update()
