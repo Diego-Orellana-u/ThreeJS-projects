@@ -156,7 +156,7 @@ const tick = () =>
     oldElapsedTime = elapsedTime
 
     // Update physics world
-    world.step(1 / 60, deltaTime, 3)
+    console.log("1")
 
     // Update controls
     controls.update()
