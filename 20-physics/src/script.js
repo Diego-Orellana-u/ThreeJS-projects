@@ -30,6 +30,21 @@ debugObject.createBox = () => {
 
 gui.add(debugObject, "createBox");
 
+debugObject.reset = () => {
+  for (const object of objectsToUpdate) {
+    //Remove body
+    object.body.removeEventListener("collide", playHitSound);
+    world.removeBody(object.body);
+
+    //Remove mesh
+    scene.remove(object.mesh);
+  }
+  //Empty array
+  objectsToUpdate.splice(0, objectsToUpdate.length);
+};
+
+gui.add(debugObject, "reset");
+
 /**
  * Base
  */
@@ -38,6 +53,18 @@ const canvas = document.querySelector("canvas.webgl");
 
 // Scene
 const scene = new THREE.Scene();
+
+const hitSound = new Audio("/sounds/hit.mp3");
+
+const playHitSound = (collision) => {
+  const impactStrength = collision.contact.getImpactVelocityAlongNormal();
+
+  if (impactStrength > 2) {
+    hitSound.volume = Math.random();
+    hitSound.currentTime = 0;
+    hitSound.play();
+  }
+};
 
 /**
  * Textures
@@ -57,6 +84,8 @@ const environmentMapTexture = cubeTextureLoader.load([
 // Physics
 // World
 let world = new CANNON.World();
+world.broadphase = new CANNON.SAPBroadphase(world);
+world.allowSleep = true;
 world.gravity.set(0, -9.82, 0);
 
 // Material
@@ -205,6 +234,8 @@ const createBox = (width, height, depth, position) => {
     shape: boxShape,
     material: defaultMaterial,
   });
+
+  boxBody.addEventListener("collide", playHitSound);
 
   world.addBody(boxBody);
   objectsToUpdate.push({ mesh: boxMesh, body: boxBody });
