@@ -1,8 +1,34 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { MTLLoader } from "three/addons/loaders/MTLLoader.js";
 import GUI from "lil-gui";
+import { color } from "three/examples/jsm/nodes/Nodes.js";
+
+const textureLoader = new THREE.TextureLoader();
+
+// Rings textures
+const ringsTexture = textureLoader.load("/textures/rings/rings.png");
+const ringsMetallic = textureLoader.load("/textures/rings/ringsMetallic.png");
+const ringsNormal = textureLoader.load("/textures/rings/ringsNormal.png");
+const ringsRoughness = textureLoader.load("/textures/rings/ringsRoughness.png");
+ringsTexture.encoding = THREE.SRGBColorSpace;
+
+// Moon textures
+const moonTexture = textureLoader.load("/textures/moon/moon.png");
+const moonMetallic = textureLoader.load("/textures/moon/moonMetallic.png");
+const moonNormal = textureLoader.load("/textures/moon/moonNormal.png");
+const moonRoughness = textureLoader.load("/textures/moon/moonRoughness.png");
+
+// Saturn textures
+const saturnTexture = textureLoader.load("/textures/saturn/saturn.png");
+const saturnNormal = textureLoader.load("/textures/saturn/saturnNormal.png");
+const saturnRoughness = textureLoader.load(
+  "/textures/saturn/saturnRoughness.png"
+);
+const saturnMetallic = textureLoader.load("/textures/saturn/saturnMetalic.png");
 
 /**
  * Base
@@ -16,51 +42,58 @@ const canvas = document.querySelector("canvas.webgl");
 // Scene
 const scene = new THREE.Scene();
 
-// loaders
-const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath("/draco/");
+// // loaders
+// const dracoLoader = new DRACOLoader();
+// dracoLoader.setDecoderPath("/draco/");
 
-const gltfLoader = new GLTFLoader();
-gltfLoader.setDRACOLoader(dracoLoader);
-
-let mixer = null;
-
-gltfLoader.load("/models/Fox/glTF/Fox.gltf", (gltf) => {
-  const children = [...gltf.scene.children];
-  for (const child of children) {
-    child.scale.set(0.025, 0.025, 0.025);
-
-    mixer = new THREE.AnimationMixer(gltf.scene);
-    const action = mixer.clipAction(gltf.animations[1]);
-
-    action.play();
-
-    scene.add(child);
-  }
-});
+// const gltfLoader = new GLTFLoader();
+// gltfLoader.setDRACOLoader(dracoLoader);
 
 /**
  * Floor
  */
-const floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(10, 10),
-  new THREE.MeshStandardMaterial({
-    color: "#444444",
-    metalness: 0,
-    roughness: 0.5,
-  })
-);
-floor.receiveShadow = true;
-floor.rotation.x = -Math.PI * 0.5;
-scene.add(floor);
+// const floor = new THREE.Mesh(
+//   new THREE.PlaneGeometry(10, 10),
+//   new THREE.MeshStandardMaterial({
+//     color: "#444444",
+//     metalness: 0,
+//     roughness: 0.5,
+//   })
+// );
+// floor.receiveShadow = true;
+// floor.rotation.x = -Math.PI * 0.5;
+// scene.add(floor);
 
+// Particles
+const particlesGeometry = new THREE.BufferGeometry();
+const particlesMaterial = new THREE.PointsMaterial();
+
+particlesMaterial.size = 0.02;
+particlesMaterial.sizeAttenuation = true;
+const particlesColor = new THREE.Color(0x444444);
+particlesMaterial.color = particlesColor;
+
+const count = 5000;
+const positions = new Float32Array(count * 3);
+
+for (let i = 0; i < count * 3; i++) {
+  positions[i] = (Math.random() - 0.5) * 10;
+}
+
+particlesGeometry.setAttribute(
+  "position",
+  new THREE.BufferAttribute(positions, 3)
+);
+
+const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+scene.add(particles);
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight(0xffffff, 2.4);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.02);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8);
+const directionalLight = new THREE.DirectionalLight(0xfdfae4, 2.5);
 directionalLight.castShadow = true;
 directionalLight.shadow.mapSize.set(1024, 1024);
 directionalLight.shadow.camera.far = 15;
@@ -68,8 +101,62 @@ directionalLight.shadow.camera.left = -7;
 directionalLight.shadow.camera.top = 7;
 directionalLight.shadow.camera.right = 7;
 directionalLight.shadow.camera.bottom = -7;
-directionalLight.position.set(5, 5, 5);
+directionalLight.position.set(5, 1, 5);
+const helper = new THREE.DirectionalLightHelper(directionalLight);
 scene.add(directionalLight);
+scene.add(helper);
+
+const mtlLoader = new MTLLoader();
+mtlLoader.load("/models/planet/planet.mtl", (materials) => {
+  materials.preload();
+
+  // console.log(materials.materials);
+
+  // Rings
+  materials.materials.Rings.map = ringsTexture;
+  materials.materials.Rings.normalMap = ringsNormal;
+  materials.materials.Rings.normalScale = new THREE.Vector2(0.1, 0.1);
+  materials.materials.Rings.roughnessMap = ringsRoughness;
+  materials.materials.Rings.metalnessMap = ringsMetallic;
+  materials.materials.Rings.transparent = true;
+  const ringsColor = new THREE.Color();
+  ringsColor.setRGB(1.8, 1.5, 1.5);
+  materials.materials.Rings.color = ringsColor;
+  materials.materials.Rings.opacity = 0.5;
+  materials.materials.Rings.emissive.setRGB(0.4, 0, 0);
+
+  // Moon
+  materials.materials.MOON.map = moonTexture;
+  materials.materials.MOON.normalMap = moonNormal;
+  materials.materials.MOON.normalScale = new THREE.Vector2(0.2, 0.2);
+  materials.materials.MOON.roughnessMap = moonRoughness;
+  materials.materials.MOON.metalnessMap = moonMetallic;
+  materials.materials.MOON.shininess = 20;
+
+  // saturn
+  materials.materials.Saturn.map = saturnTexture;
+  materials.materials.Saturn.normalMap = saturnNormal;
+  materials.materials.Saturn.normalScale = new THREE.Vector2(0.25, 0.25);
+  materials.materials.Saturn.roughnessMap = saturnRoughness;
+  materials.materials.Saturn.metalnessMap = saturnMetallic;
+  materials.materials.Saturn.shininess = 20;
+  const saturnColor = new THREE.Color();
+  saturnColor.setRGB(0.95, 0.6, 0.7);
+  materials.materials.Saturn.color = saturnColor;
+
+  console.log(materials);
+
+  const objLoader = new OBJLoader();
+  objLoader.setMaterials(materials);
+  objLoader.load("/models/planet/planet.obj", (obj) => {
+    const children = [...obj.children];
+    for (const child of children) {
+      child.castShadow = true;
+      child.receiveShadow = true;
+      scene.add(child);
+    }
+  });
+});
 
 /**
  * Sizes
@@ -121,6 +208,9 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.gammaFactor = 2.2;
+renderer.gammaOutput = true;
 
 /**
  * Animate
@@ -132,11 +222,6 @@ const tick = () => {
   const elapsedTime = clock.getElapsedTime();
   const deltaTime = elapsedTime - previousTime;
   previousTime = elapsedTime;
-
-  // update mixer
-  if (mixer !== null) {
-    mixer.update(deltaTime);
-  }
 
   // Update controls
   controls.update();
