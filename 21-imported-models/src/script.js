@@ -68,16 +68,29 @@ const scene = new THREE.Scene();
 const particlesGeometry = new THREE.BufferGeometry();
 const particlesMaterial = new THREE.PointsMaterial();
 
-particlesMaterial.size = 0.02;
+particlesMaterial.size = 0.2;
 particlesMaterial.sizeAttenuation = true;
-const particlesColor = new THREE.Color(0x444444);
+const particlesColor = new THREE.Color(0x555555);
 particlesMaterial.color = particlesColor;
 
 const count = 5000;
+const radius = 20;
 const positions = new Float32Array(count * 3);
 
-for (let i = 0; i < count * 3; i++) {
-  positions[i] = (Math.random() - 0.5) * 10;
+let x = null;
+let y = null;
+let z = null;
+
+for (let i = 0; i < count; i++) {
+  do {
+    x = (Math.random() - 0.5) * 200;
+    y = (Math.random() - 0.5) * 200;
+    z = (Math.random() - 0.5) * 200;
+  } while (Math.sqrt(x * x + y * y + z * z) < radius);
+
+  positions[i * 3] = x;
+  positions[i * 3 + 1] = y;
+  positions[i * 3 + 2] = z;
 }
 
 particlesGeometry.setAttribute(
@@ -102,9 +115,8 @@ directionalLight.shadow.camera.top = 7;
 directionalLight.shadow.camera.right = 7;
 directionalLight.shadow.camera.bottom = -7;
 directionalLight.position.set(5, 1, 5);
-const helper = new THREE.DirectionalLightHelper(directionalLight);
+// const helper = new THREE.DirectionalLightHelper(directionalLight);
 scene.add(directionalLight);
-scene.add(helper);
 
 const mtlLoader = new MTLLoader();
 mtlLoader.load("/models/planet/planet.mtl", (materials) => {
@@ -144,7 +156,7 @@ mtlLoader.load("/models/planet/planet.mtl", (materials) => {
   saturnColor.setRGB(0.95, 0.6, 0.7);
   materials.materials.Saturn.color = saturnColor;
 
-  console.log(materials);
+  // console.log(materials);
 
   const objLoader = new OBJLoader();
   objLoader.setMaterials(materials);
@@ -190,13 +202,23 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(2, 2, 2);
+camera.rotation.x = Math.PI * 0.25;
+camera.position.set(4, 0, 3);
 scene.add(camera);
+
+const axesHelper = new THREE.AxesHelper(5);
+// scene.add(axesHelper);
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
-controls.target.set(0, 0.75, 0);
+controls.target.set(0, 0.9, 0);
 controls.enableDamping = true;
+
+// controls.object.position.set(2, 1, 5);
+// controls.object.rotation.set(10, 5, 2);
+// console.log(controls.object);
+
+controls.update();
 
 /**
  * Renderer
